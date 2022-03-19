@@ -1,0 +1,17 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: docusaurus 
+  namespace: default 
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`docs.baozitao.com`) 
+      kind: Rule
+      services:
+        - kind: Service 
+          name: docusaurus 
+          namespace: default 
+          port: 80
+
