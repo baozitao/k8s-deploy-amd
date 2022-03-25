@@ -1,0 +1,17 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: cephfs 
+  namespace: rook-ceph 
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`ceph.baozitao.com`) 
+      kind: Rule
+      services:
+        - kind: Service 
+          name: rook-ceph-mgr-a 
+          namespace: rook-ceph
+          port: 7000
+

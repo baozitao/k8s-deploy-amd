@@ -1,0 +1,17 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: webmin 
+  namespace: default 
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`webmin.baozitao.com`) 
+      kind: Rule
+      services:
+        - kind: Service 
+          name: bind9 
+          namespace: default 
+          port: 1000
+

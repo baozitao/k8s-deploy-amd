@@ -1,0 +1,619 @@
+---
+apiVersion: kuboard.cn/v1
+kind: KuboardAddon
+metadata:
+  name: logs-efk.addons.kuboard.cn
+  namespace: kuboard
+spec:
+  authTarget:
+    apiGroup: ''
+    name: log-kibana
+    namespace: kuboard
+    namespaced: true
+    resource: services/proxy
+    verb: get
+  extensions:
+    - extensionParams:
+        buttonIcon: el-icon-postcard
+        buttonText: 容器组日志
+        buttonTextEn: Pod Logs
+        buttonType: primary
+        handler: "import { KuboardProxy, openUrlInBlank } from '/addon-api/index.js'\n\nexport function onClick({context, callback}) {\n  // do your logic\n  let grafanaHttp = new KuboardProxy({\n  \tnamespace: 'kuboard',\n    service: 'log-kibana',\n    port: '5601',\n    protocol: 'http://'\n  })\n  grafanaHttp.execute({\n  \tmethod: 'get',\n    url: '/api/spaces/space'\n  }).then(resp => {\n    let url = `/k8s-proxy/${$cluster}/api/v1/namespaces/kuboard/services/http:log-kibana:5601/proxy`\n    url += `/app/logs/stream?flyoutOptions=(flyoutId:!n,flyoutVisibility:hidden,surroundingLogsId:!n)&logPosition=(end:now,start:now-1h,streamLive:!t)`\n    url += `&logFilter=(expression:%27kubernetes.namespace:%22${context.pod.metadata.namespace}%22%20and%20kubernetes.pod.name:%22${context.pod.metadata.name}%22%27,kind:kuery)`\n\n    openUrlInBlank(url)\n    return callback()\n  }).catch(e => {\n    callback('打开Grafana失败', e)\n  })\n}\n"
+        isEnabledFor: |
+          export function isEnabledFor (context) {
+            return true
+          }
+      extensionPoint: pod-context.extension-point.kuboard.cn
+      id: pod-logs
+    - extensionParams:
+        buttonIcon: el-icon-postcard
+        buttonText: 容器日志
+        buttonTextEn: Container Logs
+        buttonType: primary
+        handler: "import { KuboardProxy, openUrlInBlank } from '/addon-api/index.js'\n\nexport function onClick({context, callback}) {\n  // do your logic\n  let grafanaHttp = new KuboardProxy({\n  \tnamespace: 'kuboard',\n    service: 'log-kibana',\n    port: '5601',\n    protocol: 'http://'\n  })\n  grafanaHttp.execute({\n  \tmethod: 'get',\n    url: '/api/spaces/space'\n  }).then(resp => {\n    let url = `/k8s-proxy/${$cluster}/api/v1/namespaces/kuboard/services/http:log-kibana:5601/proxy`\n    url += `/app/logs/stream?flyoutOptions=(flyoutId:!n,flyoutVisibility:hidden,surroundingLogsId:!n)&logPosition=(end:now,start:now-1h,streamLive:!t)`\n    url += `&logFilter=(expression:%27kubernetes.namespace:%22${context.pod.metadata.namespace}%22%20and%20kubernetes.pod.name:%22${context.pod.metadata.name}%22%20and%20kubernetes.container.name:%22${context.container.name}%22%27,kind:kuery)`\n\n    openUrlInBlank(url)\n    return callback()\n  }).catch(e => {\n    callback('打开Grafana失败', e)\n  })\n}\n"
+        isEnabledFor: |
+          export function isEnabledFor (context) {
+            return true
+          }
+      extensionPoint: container-context.extension-point.kuboard.cn
+      id: container-logs
+    - extensionParams:
+        buttonIcon: el-icon-postcard
+        buttonText: 工作负载日志
+        buttonTextEn: Workload Logs
+        buttonType: primary
+        handler: "import { KuboardProxy, openUrlInBlank } from '/addon-api/index.js'\n\nexport function onClick({context, callback}) {\n  // do your logic\n  let grafanaHttp = new KuboardProxy({\n  \tnamespace: 'kuboard',\n    service: 'log-kibana',\n    port: '5601',\n    protocol: 'http://'\n  })\n  grafanaHttp.execute({\n  \tmethod: 'get',\n    url: '/api/spaces/space'\n  }).then(resp => {\n    let url = `/k8s-proxy/${$cluster}/api/v1/namespaces/kuboard/services/http:log-kibana:5601/proxy`\n    url += `/app/logs/stream?flyoutOptions=(flyoutId:!n,flyoutVisibility:hidden,surroundingLogsId:!n)&logPosition=(end:now,start:now-1h,streamLive:!t)`\n    url += `&logFilter=(expression:%27kubernetes.namespace:%22${context.workload.metadata.namespace}%22%20and%20kubernetes.${context.workload.kind.toLowerCase()}.name:%22${context.workload.metadata.name}%22%27,kind:kuery)`\n\n    openUrlInBlank(url)\n    return callback()\n  }).catch(e => {\n    callback('打开Grafana失败', e)\n  })\n}\n"
+        isEnabledFor: |
+          export function isEnabledFor (context) {
+            return true
+          }
+      extensionPoint: workload-context.extension-point.kuboard.cn
+      id: workload-logs
+  scope: Cluster
+  info:
+    name: 日志聚合套件 EFK
+    id: logs-efk.addons.kuboard.cn
+    version: v3.0.0
+    lastUpdate: '2021-05-16'
+    maintainer: shaohq@foxmail.com
+    scope: Cluster
+    description: 基于ElasticSearch/Filebeat/Kibana提供集群级别的日志聚合
+    document: 'https://addons.kuboard.cn/kuboard-efk/v3.0.0/README.md'
+    addonUrl: 'https://addons.kuboard.cn/kuboard-efk/v3.0.0/addon.yaml'
+    addonResourceUrl: 'https://addons.kuboard.cn/kuboard-efk/v3.0.0/addonResource.yaml'
+status:
+  status: LOADED
+
+
+---
+apiVersion: kuboard.cn/v1
+k8sYamls:
+  logs-efk.yaml: |+
+
+    ---
+    kind: Deployment
+    apiVersion: apps/v1
+    metadata:
+      name: log-kibana
+      namespace: kuboard
+      labels:
+        k8s.kuboard.cn/layer: monitor
+        k8s.kuboard.cn/name: log-kibana
+    spec:
+      replicas: 2
+      selector:
+        matchLabels:
+          k8s.kuboard.cn/layer: monitor
+          k8s.kuboard.cn/name: log-kibana
+      template:
+        metadata:
+          labels:
+            k8s.kuboard.cn/layer: monitor
+            k8s.kuboard.cn/name: log-kibana
+        spec:
+          containers:
+            - name: log-kibana
+              image: 'swr.cn-east-2.myhuaweicloud.com/kuboard-dependency/kibana:7.12.1'
+              ports:
+                - name: web
+                  containerPort: 5601
+                  protocol: TCP
+              env:
+                - name: SERVER_NAME
+                  value: log-kibana
+                - name: ELASTICSEARCH_HOSTS
+                  value: 'http://log-elasticsearch:9200'
+                - name: SERVER_BASEPATH
+                  value: >-
+                    /k8s-proxy/${KUBERNETES_CLUSTER}/api/v1/namespaces/kuboard/services/http:log-kibana:5601/proxy
+              livenessProbe:
+                httpGet:
+                  path: /api/spaces/space
+                  port: 5601
+                  scheme: HTTP
+                initialDelaySeconds: 180
+                timeoutSeconds: 1
+                periodSeconds: 10
+                successThreshold: 1
+                failureThreshold: 3
+              readinessProbe:
+                httpGet:
+                  path: /api/spaces/space
+                  port: 5601
+                  scheme: HTTP
+                timeoutSeconds: 1
+                periodSeconds: 10
+                successThreshold: 1
+                failureThreshold: 3
+              startupProbe:
+                httpGet:
+                  path: /api/spaces/space
+                  port: 5601
+                  scheme: HTTP
+                timeoutSeconds: 1
+                periodSeconds: 10
+                successThreshold: 1
+                failureThreshold: 5
+              terminationMessagePath: /dev/termination-log
+              terminationMessagePolicy: File
+              imagePullPolicy: Always
+          restartPolicy: Always
+          terminationGracePeriodSeconds: 20
+          dnsPolicy: ClusterFirst
+      strategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: 25%
+          maxSurge: 25%
+
+    ---
+    kind: DaemonSet
+    apiVersion: apps/v1
+    metadata:
+      name: log-filebeat
+      namespace: kuboard
+      labels:
+        k8s.kuboard.cn/layer: monitor
+        k8s.kuboard.cn/name: log-filebeat
+    spec:
+      selector:
+        matchLabels:
+          k8s.kuboard.cn/layer: monitor
+          k8s.kuboard.cn/name: log-filebeat
+      template:
+        metadata:
+          labels:
+            k8s.kuboard.cn/layer: monitor
+            k8s.kuboard.cn/name: log-filebeat
+        spec:
+          volumes:
+            - name: config
+              configMap:
+                name: log-filebeat-config
+                defaultMode: 416
+            - name: varlibdockercontainers
+              hostPath:
+                path: ${DOCKER_ROOT_DIR}/containers
+                type: ''
+            - name: varlog
+              hostPath:
+                path: /var/log
+                type: ''
+            - name: data
+              hostPath:
+                path: /var/lib/filebeat-data
+                type: DirectoryOrCreate
+          containers:
+            - name: log-filebeat
+              image: 'swr.cn-east-2.myhuaweicloud.com/kuboard-dependency/filebeat:7.12.1'
+              args:
+                - '-c'
+                - /etc/filebeat.yml
+                - '-e'
+              env:
+                - name: ELASTICSEARCH_HOST
+                  value: log-elasticsearch
+                - name: ELASTICSEARCH_PORT
+                  value: '9200'
+                - name: NODE_NAME
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: spec.nodeName
+                - name: ELASTICSEARCH_USERNAME
+                  value: elastic
+                - name: ELASTICSEARCH_PASSWORD
+                  value: changeme
+              resources:
+                limits:
+                  memory: 200Mi
+                requests:
+                  cpu: 100m
+                  memory: 100Mi
+              volumeMounts:
+                - name: config
+                  readOnly: true
+                  mountPath: /etc/filebeat.yml
+                  subPath: filebeat.yml
+                - name: data
+                  mountPath: /usr/share/filebeat/data
+                - name: varlibdockercontainers
+                  readOnly: true
+                  mountPath: /var/lib/docker/containers
+                - name: varlog
+                  readOnly: true
+                  mountPath: /var/log
+              imagePullPolicy: IfNotPresent
+              securityContext:
+                runAsUser: 0
+          restartPolicy: Always
+          terminationGracePeriodSeconds: 20
+          dnsPolicy: ClusterFirstWithHostNet
+          serviceAccountName: log-filebeat
+          hostNetwork: true
+          tolerations:
+            - key: node-role.kubernetes.io/master
+              operator: Exists
+      updateStrategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: 1
+
+    ---
+    kind: StatefulSet
+    apiVersion: apps/v1
+    metadata:
+      name: log-elasticsearch
+      namespace: kuboard
+      labels:
+        k8s.kuboard.cn/layer: monitor
+        k8s.kuboard.cn/name: log-elasticsearch
+    spec:
+      replicas: 3
+      selector:
+        matchLabels:
+          k8s.kuboard.cn/layer: monitor
+          k8s.kuboard.cn/name: log-elasticsearch
+      template:
+        metadata:
+          labels:
+            k8s.kuboard.cn/layer: monitor
+            k8s.kuboard.cn/name: log-elasticsearch
+        spec:
+          initContainers:
+            - name: configure-sysctl
+              image: >-
+                swr.cn-east-2.myhuaweicloud.com/kuboard-dependency/elasticsearch:7.12.1
+              command:
+                - /bin/bash
+                - '-c'
+                - sysctl -w vm.max_map_count=262144;
+              imagePullPolicy: IfNotPresent
+              securityContext:
+                privileged: true
+                runAsUser: 0
+          containers:
+            - name: elastic-search
+              image: >-
+                swr.cn-east-2.myhuaweicloud.com/kuboard-dependency/elasticsearch:7.12.1
+              command:
+                - /bin/bash
+                - '-c'
+                - |-
+                  #!/bin/bash
+                  ulimit -l unlimited
+                  echo ulimit
+                  exec su elasticsearch /usr/local/bin/docker-entrypoint.sh
+              ports:
+                - name: tcp
+                  containerPort: 9300
+                  protocol: TCP
+                - name: restful
+                  containerPort: 9200
+                  protocol: TCP
+              env:
+                - name: node.name
+                  valueFrom:
+                    fieldRef:
+                      apiVersion: v1
+                      fieldPath: metadata.name
+                - name: cluster.name
+                  value: log-elasticsearch-cluster
+                - name: discovery.seed_hosts
+                  value: log-elasticsearch-discovery
+                - name: cluster.initial_master_nodes
+                  value: 'log-elasticsearch-0,log-elasticsearch-1,log-elasticsearch-2'
+                - name: bootstrap.memory_lock
+                  value: 'true'
+                - name: ES_JAVA_OPTS
+                  value: '-Xms2048m -Xmx2048m'
+              volumeMounts:
+                - name: data
+                  mountPath: /usr/share/elasticsearch/data
+              livenessProbe:
+                httpGet:
+                  path: /_nodes/_local/process?pretty
+                  port: 9200
+                  scheme: HTTP
+                initialDelaySeconds: 600
+                timeoutSeconds: 1
+                periodSeconds: 10
+                successThreshold: 1
+                failureThreshold: 5
+              readinessProbe:
+                httpGet:
+                  path: /_nodes/_local/process?pretty
+                  port: 9200
+                  scheme: HTTP
+                initialDelaySeconds: 60
+                timeoutSeconds: 1
+                periodSeconds: 10
+                successThreshold: 1
+                failureThreshold: 5
+              startupProbe:
+                httpGet:
+                  path: /_nodes/_local/process?pretty
+                  port: 9200
+                  scheme: HTTP
+                initialDelaySeconds: 30
+                timeoutSeconds: 1
+                periodSeconds: 10
+                successThreshold: 1
+                failureThreshold: 40
+              imagePullPolicy: IfNotPresent
+              resources:
+                limits:
+                  memory: 2700Mi
+                requests:
+                  memory: 2700Mi
+              securityContext:
+                privileged: true
+          restartPolicy: Always
+          terminationGracePeriodSeconds: 30
+          dnsPolicy: ClusterFirst
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: k8s.kuboard.cn/name
+                          operator: In
+                          values:
+                            - log-elasticsearch
+                    topologyKey: kubernetes.io/hostname
+      volumeClaimTemplates:
+        - kind: PersistentVolumeClaim
+          apiVersion: v1
+          metadata:
+            name: data
+            annotations:
+              k8s.kuboard.cn/pvcType: Dynamic
+          spec:
+            accessModes:
+              - ReadWriteMany
+            resources:
+              requests:
+                storage: 40Gi
+            storageClassName: rook-ceph-fs
+            volumeMode: Filesystem
+      serviceName: log-elasticsearch-discovery
+      podManagementPolicy: OrderedReady
+      updateStrategy:
+        type: RollingUpdate
+        rollingUpdate:
+          partition: 0
+      revisionHistoryLimit: 10
+
+    ---
+    kind: Service
+    apiVersion: v1
+    metadata:
+      name: log-elasticsearch
+      namespace: kuboard
+      labels:
+        k8s.kuboard.cn/layer: monitor
+        k8s.kuboard.cn/name: log-elasticsearch
+    spec:
+      ports:
+        - name: restful
+          protocol: TCP
+          port: 9200
+          targetPort: 9200
+      selector:
+        k8s.kuboard.cn/layer: monitor
+        k8s.kuboard.cn/name: log-elasticsearch
+      type: ClusterIP
+      sessionAffinity: ClientIP
+      sessionAffinityConfig:
+        clientIP:
+          timeoutSeconds: 10800
+
+    ---
+    kind: Service
+    apiVersion: v1
+    metadata:
+      name: log-elasticsearch-discovery
+      namespace: kuboard
+    spec:
+      ports:
+        - name: tcpp
+          protocol: TCP
+          port: 9300
+          targetPort: 9300
+      selector:
+        k8s.kuboard.cn/layer: monitor
+        k8s.kuboard.cn/name: log-elasticsearch
+      type: ClusterIP
+      sessionAffinity: None
+      publishNotReadyAddresses: true
+
+    ---
+    kind: Service
+    apiVersion: v1
+    metadata:
+      name: log-kibana
+      namespace: kuboard
+      labels:
+        k8s.kuboard.cn/layer: monitor
+        k8s.kuboard.cn/name: log-kibana
+    spec:
+      ports:
+        - name: web
+          protocol: TCP
+          port: 5601
+          targetPort: 5601
+      selector:
+        k8s.kuboard.cn/layer: monitor
+        k8s.kuboard.cn/name: log-kibana
+      type: ClusterIP
+      sessionAffinity: ClientIP
+      sessionAffinityConfig:
+        clientIP:
+          timeoutSeconds: 10800
+
+    ---
+    kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: log-filebeat-config
+      namespace: kuboard
+      labels:
+        k8s-app: log-filebeat
+    data:
+      filebeat.yml: >-
+        filebeat.inputs:
+
+        - type: container
+          paths:
+            - /var/log/containers/*.log
+          processors:
+            - add_kubernetes_metadata:
+                host: ${NODE_NAME}
+                matchers:
+                - logs_path:
+                    logs_path: "/var/log/containers/"
+
+        # To enable hints based autodiscover, remove `filebeat.inputs` configuration
+        and uncomment this:
+
+        #filebeat.autodiscover:
+
+        #  providers:
+
+        #    - type: kubernetes
+
+        #      node: ${NODE_NAME}
+
+        #      hints.enabled: true
+
+        #      hints.default_config:
+
+        #        type: container
+
+        #        paths:
+
+        #          - /var/log/containers/*${data.kubernetes.container.id}.log
+
+
+        processors:
+          - add_cloud_metadata:
+          - add_host_metadata:
+
+        cloud.id: ${ELASTIC_CLOUD_ID}
+
+        cloud.auth: ${ELASTIC_CLOUD_AUTH}
+
+
+        output.elasticsearch:
+          hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
+          username: ${ELASTICSEARCH_USERNAME}
+          password: ${ELASTICSEARCH_PASSWORD}
+
+    ---
+    kind: ServiceAccount
+    apiVersion: v1
+    metadata:
+      name: log-filebeat
+      namespace: kuboard
+      labels:
+        k8s-app: log-filebeat
+
+    ---
+    kind: ClusterRoleBinding
+    apiVersion: rbac.authorization.k8s.io/v1
+    metadata:
+      name: log-filebeat
+    subjects:
+      - kind: ServiceAccount
+        name: log-filebeat
+        namespace: kuboard
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: log-filebeat
+
+    ---
+    kind: ClusterRole
+    apiVersion: rbac.authorization.k8s.io/v1
+    metadata:
+      name: log-filebeat
+      labels:
+        k8s-app: log-filebeat
+    rules:
+      - verbs:
+          - get
+          - watch
+          - list
+        apiGroups:
+          - ''
+        resources:
+          - namespaces
+          - pods
+          - nodes
+      - verbs:
+          - get
+          - list
+          - watch
+        apiGroups:
+          - apps
+        resources:
+          - replicasets
+
+kind: KuboardAddonResource
+lifecycleHandler:
+  additionalStep: |-
+    <li style="font-size: 14px; color: red; font-weight: 500">
+      Kuboard 版本不低于 v3.1.0
+    </li>
+    <li style="font-size: 14px;">
+      所有节点的时钟已经同步；
+    </li>
+    <li style="font-size: 14px;">
+      请确保您的集群至少有三个工作节点，且每个工作节点至少有 3G 的空闲内存，才可以安装此套件；
+    </li>
+    <li style="font-size: 14px;">
+      根据您集群的性能不同，ElasticSearch 以及 Kibana 从安装到最后初始化成功需要 10 - 25 分钟，因此强烈不推荐初学者使用此套件；
+    </li>
+    <li style="font-size: 14px; color: red; font-weight: 500">
+      在任意节点上执行
+      <code style="margin-left: 20px;">
+        docker info
+      </code>
+      <span style="margin-left: 20px;">确保参数 DOCKER_ROOT_DIR 与 docker info 指令输出结果中的 Docker Root Dir 的取值相同。</span>
+    </li>
+    <li>
+      如果您安装集群时，使用的容器引擎不是 docker 而是 containerd，则可以忽略此参数。
+    </li>
+  beforeUninstall: JavaScriptToExecuteBeforeUninstall
+  disable: JavaScriptToExecuteBeforeDisable
+  initialize: >-
+    import { startInitTasks, completeInitTask, failInitTask, KuboardProxy } from
+    '/addon-api/index.js'
+
+
+    export function initializeKuboardAddon (initContext) {
+      startInitTasks([
+        {name: 'logs-efk', description: '初始化任务 logs-efk', descriptionEn: 'init task: logs-efk' },
+      ])
+      setTimeout(_ => {
+        completeInitTask('logs-efk')
+      }, 1000)
+      console.log('finished')
+    }
+  install:
+    - logs-efk.yaml
+metadata:
+  namespace: kuboard
+  name: logs-efk.addons.kuboard.cn
+parameters:
+  - default: /var/lib/docker
+    description: Docker 所在安装路径，可通过 docker info 获得
+    descriptionEn: 'Docker installation Path, can be obtained with docker info command'
+    name: DOCKER_ROOT_DIR
+    required: true
+    type: string
+    value: /var/lib/docker
+
+
