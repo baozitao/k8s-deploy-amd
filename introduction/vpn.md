@@ -19,7 +19,15 @@ curl https://get.acme.sh | sh
 ```
 bash <(curl -Ls https://raw.githubusercontent.com/vaxilu/x-ui/master/install.sh)
 ```
+> bbr 加速脚本,直接选择11
+```
+wget -N --no-check-certificate "https://github.000060000.xyz/tcpx.sh" && chmod +x tcpx.sh && ./tcpx.sh
+```
 
+> bbr 优化,先选2，后选3即可
+```
+bash <(curl -Ls https://github.com/lanziii/bbr-/releases/download/123/tools.sh)
+```
 
 
 
