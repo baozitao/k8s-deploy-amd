@@ -3,6 +3,8 @@
 ```
 timedatectl set-timezone Asia/Shanghai
 ```
+> 将所需的翻墙端口打开
+> 可以是443,或者其他
 
 > 更新及安装组件
 ```
