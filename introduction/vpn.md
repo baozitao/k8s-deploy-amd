@@ -15,6 +15,11 @@ curl https://get.acme.sh | sh
 ~/.acme.sh/acme.sh  --issue -d vpn.baozitao.com   --standalone
 ~/.acme.sh/acme.sh --installcert -d vpn.baozitao.com --key-file /root/private.key --fullchain-file /root/cert.crt
 ```
+> 证书位置
+```
+/root/cert.crt  
+/root/private.key
+
 > 安装x-ui面板
 ```
 bash <(curl -Ls https://raw.githubusercontent.com/vaxilu/x-ui/master/install.sh)
