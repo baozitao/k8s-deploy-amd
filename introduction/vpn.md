@@ -19,7 +19,7 @@ curl https://get.acme.sh | sh
 ```
 /root/cert.crt  
 /root/private.key
-
+```
 > 安装x-ui面板
 ```
 bash <(curl -Ls https://raw.githubusercontent.com/vaxilu/x-ui/master/install.sh)
