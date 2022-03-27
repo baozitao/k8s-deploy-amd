@@ -1,4 +1,9 @@
 # VPN
+> 更新时间
+```
+timedatectl set-timezone Asia/Shanghai
+```
+
 > 更新及安装组件
 ```
 apt update -y          
