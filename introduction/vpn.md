@@ -24,7 +24,7 @@ curl https://get.acme.sh | sh
 ```
 > 证书位置
 ```
-/root/cert.crt  
+/root/cert.crt
 /root/private.key
 ```
 > 证书是90天的，acme.sh设置了linux conjob自动更新计划，快到期就自动更新，可以查看自动更新任务
@@ -47,6 +47,7 @@ acme.sh  --upgrade  --auto-upgrade
 ```
 bash <(curl -Ls https://raw.githubusercontent.com/vaxilu/x-ui/master/install.sh)
 ```
+## 可以选择使用脚本开启
 > bbr 加速脚本,直接选择11
 ```
 wget -N --no-check-certificate "https://github.000060000.xyz/tcpx.sh" && chmod +x tcpx.sh && ./tcpx.sh
@@ -55,6 +56,46 @@ wget -N --no-check-certificate "https://github.000060000.xyz/tcpx.sh" && chmod +
 > bbr 优化,先选2，后选3即可
 ```
 bash <(curl -Ls https://github.com/lanziii/bbr-/releases/download/123/tools.sh)
+```
+
+
+## 使用内核自带的bbr+fq即可
+> 增加官方backports 的 bbr 源
+```
+echo “deb http://deb.debian.org/debian buster-backports main” | sudo tee /etc/apt/sources.list.d/vpsadmin.list
+```
+
+
+> 刷新软件库并查询 Debian 官方的最新版内核并安装。请务必安装你的 VPS 对应的版本（本文以比较常见的【amd64】为例）
+```
+sudo apt update && sudo apt -t buster-backports install linux-image-amd64
+```
+
+> 修改 kernel 参数配置文件 sysctl.conf 并指定开启 BBR
+```
+cat << EOF >> /etc/sysctl.d/vpsadmin.conf
+net.core.default_qdisc=fq
+net.ipv4.tcp_congestion_control=bbr
+EOF
+```
+
+> 重启机器，是内核更新和BBR设置生效
+```
+sudo reboot
+```
+
+> 查看bbr 是否开启
+```
+lsmod | grep bbr
+
+> tcp_bbr
+```
+
+> fq 算法是否开启
+```
+lsmod | grep fq
+
+> sch_fq
 ```
 
 
