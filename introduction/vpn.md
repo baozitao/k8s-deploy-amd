@@ -27,6 +27,22 @@ curl https://get.acme.sh | sh
 /root/cert.crt  
 /root/private.key
 ```
+> 证书是90天的，acme.sh设置了linux conjob自动更新计划，快到期就自动更新，可以查看自动更新任务
+```
+crontab -l
+> 47 0 * * * "/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh" > /dev/null
+```
+
+> 也可以手动更新
+```
+acme.sh --cron -f
+```
+
+> 目前由于 acme 协议和 letsencrypt CA 都在频繁的更新, 因此 acme.sh 也经常更新以保持同步.所以为了省心省力，最好还是设置一下软件的自动更新，执行下面的命令就可以了
+```
+acme.sh  --upgrade  --auto-upgrade
+```
+
 > 安装x-ui面板
 ```
 bash <(curl -Ls https://raw.githubusercontent.com/vaxilu/x-ui/master/install.sh)
