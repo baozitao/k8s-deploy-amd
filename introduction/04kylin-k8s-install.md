@@ -1,8 +1,8 @@
 ---
-title: 04kylin-k8s-install
+title: re-kylin-k8s-install
 description: 
 published: true
-date: 2022-04-01T17:25:46.790Z
+date: 2022-04-01T17:33:08.267Z
 tags: 
 editor: markdown
 dateCreated: 2022-04-01T17:04:18.210Z
