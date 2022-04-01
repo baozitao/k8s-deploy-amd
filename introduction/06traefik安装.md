@@ -1,8 +1,8 @@
 ---
-title: 06traefik安装
+title: re-traefik安装
 description: 
 published: true
-date: 2022-04-01T17:04:26.139Z
+date: 2022-04-01T17:35:55.288Z
 tags: 
 editor: markdown
 dateCreated: 2022-04-01T17:04:24.108Z
