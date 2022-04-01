@@ -1,3 +1,13 @@
+---
+title: baojt
+description: 
+published: true
+date: 2022-04-01T17:04:38.806Z
+tags: 
+editor: markdown
+dateCreated: 2022-04-01T17:04:36.827Z
+---
+
 # pub key
 ```
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDBaQOH4J/9pn0019/ddK0+bnw5N9l8SvrzdC+QbDhMbOMCc82C2uXL0bmrAPDjzacFKTnVeWf+h+LnpNJPzGHoZWeF5YHHrfsglk6wYRAxIKAtQd0oNd2r5TRAuK79zr3SonxVOnp608I9855hCisvD/1WExW5H9RKiUMDwtZB6xknmVIgujUbDdyTBIkbat/mUQLEbeNEeaQelDc4O4tYO1aIZIC4wpvRBk6RPVOFKsTv2qov+S6FOjZIIw1aiWAiTXYqhhEm6m81AYgfS5aS1+8cja3YeXyUIapLE01wJ0QA8iiQuvYYcUz1OGCArX1CB1XKnvSvVo49KIyAv2UV baojt
