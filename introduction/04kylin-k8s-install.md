@@ -2,13 +2,13 @@
 title: re-kylin-k8s-install
 description: 
 published: true
-date: 2022-04-01T17:33:10.517Z
+date: 2022-04-01T17:45:14.637Z
 tags: 
 editor: markdown
 dateCreated: 2022-04-01T17:04:18.210Z
 ---
 
-# 04.kylin-k8s-install
+# re-kylin-k8s-install
 
 ### 关闭交换分区223
 
