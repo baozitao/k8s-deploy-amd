@@ -2,7 +2,7 @@
 title: 04kylin-k8s-install
 description: 
 published: true
-date: 2022-04-01T17:06:58.228Z
+date: 2022-04-01T17:25:33.306Z
 tags: 
 editor: markdown
 dateCreated: 2022-04-01T17:04:18.210Z
@@ -10,7 +10,7 @@ dateCreated: 2022-04-01T17:04:18.210Z
 
 # 04.kylin-k8s-install
 
-### 关闭交换分区22
+### 关闭交换分区223
 
 ```
 swapoff -a 
