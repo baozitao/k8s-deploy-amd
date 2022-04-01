@@ -2,7 +2,7 @@
 title: re-kubekey
 description: 
 published: true
-date: 2022-04-01T17:32:39.980Z
+date: 2022-04-01T17:32:42.475Z
 tags: 
 editor: markdown
 dateCreated: 2022-04-01T17:04:15.011Z

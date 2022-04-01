@@ -2,7 +2,7 @@
 title: re-nfs存储安装
 description: 
 published: true
-date: 2022-04-01T17:36:09.103Z
+date: 2022-04-01T17:36:11.210Z
 tags: 
 editor: markdown
 dateCreated: 2022-04-01T17:04:21.210Z
