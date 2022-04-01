@@ -1,8 +1,8 @@
 ---
-title: 07安装helm
+title: re-安装helm
 description: 
 published: true
-date: 2022-04-01T17:04:29.007Z
+date: 2022-04-01T17:35:33.748Z
 tags: 
 editor: markdown
 dateCreated: 2022-04-01T17:04:27.012Z
