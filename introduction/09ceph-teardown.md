@@ -1,11 +1,11 @@
 ---
-title: re-ceph-teardown
+title: ceph-teardown
 description: 
 published: true
-date: 2022-04-02T05:58:59.287Z
+date: 2022-04-02T05:58:55.056Z
 tags: 
 editor: markdown
-dateCreated: 2022-04-01T17:04:33.743Z
+dateCreated: 2022-04-02T02:00:56.246Z
 ---
 
 ---
