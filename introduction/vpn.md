@@ -1,20 +1,11 @@
----
-title: re-vpn
-description: 
-published: true
-date: 2022-04-02T05:59:03.889Z
-tags: 
-editor: markdown
-dateCreated: 2022-04-01T17:04:39.682Z
----
-
 # VPN
 > 更新时间
 ```
 timedatectl set-timezone Asia/Shanghai
 ```
-> 将所需的翻墙端口打开
-> 可以是443,或者其他
+
+## 可以选择自己弄acme.sh
+> 将所需的翻墙端口打开，可以是443,或者其他
 
 > 更新及安装组件
 ```
@@ -52,7 +43,7 @@ acme.sh --cron -f
 ```
 acme.sh  --upgrade  --auto-upgrade
 ```
-
+## 也可以选择使用x-ui自带的工具完成
 > 安装x-ui面板
 ```
 bash <(curl -Ls https://raw.githubusercontent.com/vaxilu/x-ui/master/install.sh)
@@ -69,7 +60,7 @@ bash <(curl -Ls https://github.com/lanziii/bbr-/releases/download/123/tools.sh)
 ```
 
 
-## 使用内核自带的bbr+fq即可
+## 最好使用内核自带的bbr+fq
 > 增加官方backports 的 bbr 源
 ```
 echo “deb http://deb.debian.org/debian buster-backports main” | sudo tee /etc/apt/sources.list.d/vpsadmin.list

@@ -1,19 +1,3 @@
----
-title: re-ceph-teardown
-description: 
-published: true
-date: 2022-04-02T05:58:59.287Z
-tags: 
-editor: markdown
-dateCreated: 2022-04-01T17:04:33.743Z
----
-
----
-title: Cleanup
-weight: 3900
-indent: true
----
-
 # Cleaning up a Cluster
 
 If you want to tear down the cluster and bring up a new one, be aware of the following resources that will need to be cleaned up:
